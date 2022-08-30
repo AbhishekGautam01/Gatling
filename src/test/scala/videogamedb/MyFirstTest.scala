@@ -1,0 +1,5 @@
+package videogamedb
+
+class MyFirstTest {
+
+}
