@@ -16,10 +16,14 @@ class CheckResponseBodyAndExtract extends Simulation{
     .exec(http("Get All Video Games")
     .get("/videogame")
     .check(jsonPath("$[1].id").saveAs("gameId")))
-
+    .exec{
+      session => println(session); session //returning the session
+    }
     .exec(http("Get specific game")
       .get("/videogame/#{gameId}") // using the saved paramter
-    .check(jsonPath("$.name").is("Gran Turismo 3")))
+    .check(jsonPath("$.name").is("Gran Turismo 3"))
+    .check(bodyString.saveAs("responseBody")))
+    .exec{session => println(session("responseBody").as[String]); session}// bodyString is special gatling variable
 
   setUp(
     scn.inject(atOnceUsers(1))
