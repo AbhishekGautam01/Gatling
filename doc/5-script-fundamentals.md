@@ -135,3 +135,23 @@ class CheckResponseBodyAndExtract extends Simulation{
 }
 
 ```
+
+## Debug Session Variables in Gatling
+* using session we can print the variables which are stored inside the session 
+* also we can use a special variable bodyString to get access to the entire body of the session. 
+
+```scala
+.exec(http("Get All Video Games")
+    .get("/videogame")
+    .check(jsonPath("$[1].id").saveAs("gameId")))
+    .exec{
+      session => println(session); session //returning the session
+    }
+.exec(http("Get specific game")
+    .get("/videogame/#{gameId}") // using the saved paramter
+.check(jsonPath("$.name").is("Gran Turismo 3"))
+.check(bodyString.saveAs("responseBody")))
+.exec{session => println(session("responseBody").as[String]); session}// bodyString is special gatling variable
+```
+
+* Another thing we can do is to enable logging by editing `logback-test.xml` file. 
