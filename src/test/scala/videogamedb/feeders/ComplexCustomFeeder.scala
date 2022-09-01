@@ -43,10 +43,16 @@ class ComplexCustomFeeder extends Simulation{
   }
 
   def createNewGame(): ChainBuilder = {
-    exec(http("Create new game")
-      .post("/videogame")
-      .header("Authorization","Bearer #{jwtToken}")
-      .body(StringBody("{\n  \"category\": \"Platform\",\n  \"name\": \"Mario\",\n  \"rating\": \"Mature\",\n  \"releaseDate\": \"2012-05-04\",\n  \"reviewScore\": 85\n}")))
+    repeat(10){
+      feed(customFeeder)
+      .exec(http("Create new game: #{name}")
+        .post("/videogame")
+        .header("Authorization","Bearer #{jwtToken}")
+        .body(ElFileBody("bodies/newGameTemplate.json")).asJson // Expression language file body
+        .check(bodyString.saveAs("responseBody")))
+        .exec{session => println(session("responseBody").as[String]); session}
+        .pause(1)
+    }
   }
 
   val scn = scenario("Authenticate")

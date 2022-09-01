@@ -105,3 +105,34 @@ var idNumbers = (1 to 10).iterator
   ))
 
   ```
+
+  ## Templating files
+
+  * IN resources directly create a new directory name it bodies and create a new file `newGame.json` there which will act as template id. 
+  ```json
+{
+  "id": #{gameId},
+  "category": "#{category}",
+  "name": "#{name}",
+  "rating": "#{rating}",
+  "releaseDate": "#{releaseDate}",
+  "reviewScore": #{reviewScore}
+}
+  ```
+
+  * Then use it in your file as 
+
+```scala
+def createNewGame(): ChainBuilder = {
+    repeat(10){
+      feed(customFeeder)
+      .exec(http("Create new game: #{name}")
+        .post("/videogame")
+        .header("Authorization","Bearer #{jwtToken}")
+        .body(ElFileBody("bodies/newGameTemplate.json")).asJson // Expression language file body
+        .check(bodyString.saveAs("responseBody")))
+        .exec{session => println(session("responseBody").as[String]); session}
+        .pause(1)
+    }
+  }
+```
