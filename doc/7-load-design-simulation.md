@@ -91,3 +91,26 @@ class RampUsersLoadSimulation extends Simulation {
 ```
 
 ## Fixed User per second
+* We can use forever block while building up the scenario. 
+```scala
+  val scn = scenario("Basic Load Simulation")
+    .forever{ // to make it run forever
+      exec(getAllVideoGames())
+        .pause(2)
+        .exec(getSpecificVideoGames())
+        .pause(5)
+        .exec(getAllVideoGames())
+    }
+
+```
+
+* Then we can add max duration to our scenario
+```scala
+  setUp(
+    scn.inject(
+      nothingFor(5),
+      atOnceUsers(10),
+      rampUsers(20).during(30)
+    ).protocols(httpProtocol)
+  ).maxDuration(60) // after 60 seconds the test should stop
+  ```

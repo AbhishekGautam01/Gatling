@@ -22,17 +22,20 @@ class FixedUserLoadSimulation extends Simulation {
   }
 
   val scn = scenario("Basic Load Simulation")
-    .exec(getAllVideoGames())
-    .pause(2)
-    .exec(getSpecificVideoGames())
-    .pause(5)
-    .exec(getAllVideoGames())
+    .forever{ // to make it run forever
+      exec(getAllVideoGames())
+        .pause(2)
+        .exec(getSpecificVideoGames())
+        .pause(5)
+        .exec(getAllVideoGames())
+    }
+
 
   setUp(
     scn.inject(
       nothingFor(5),
-      constantUsersPerSec(10).during(10), //Here the time is in seconds
-      rampUsersPerSec(1).to(5).during(5)
+      atOnceUsers(10),
+      rampUsers(20).during(30)
     ).protocols(httpProtocol)
-  )
+  ).maxDuration(60) // after 60 seconds the test should stop
 }
